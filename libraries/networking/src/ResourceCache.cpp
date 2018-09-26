@@ -10,6 +10,7 @@
 //
 
 #include "ResourceCache.h"
+#include "ResourceRequestObserver.h"
 
 #include <cfloat>
 #include <cmath>
@@ -337,7 +338,7 @@ QVariantList ResourceCache::getResourceList() {
 
     return list;
 }
- 
+
 void ResourceCache::setRequestLimit(int limit) {
     _requestLimit = limit;
 
@@ -353,30 +354,32 @@ QSharedPointer<Resource> ResourceCache::getResource(const QUrl& url, const QUrl&
         QReadLocker locker(&_resourcesLock);
         resource = _resources.value(url).lock();
     }
+
     if (resource) {
         removeUnusedResource(resource);
-        return resource;
     }
 
-    if (!url.isValid() && !url.isEmpty() && fallback.isValid()) {
-        return getResource(fallback, QUrl());
+    if (!resource && !url.isValid() && !url.isEmpty() && fallback.isValid()) {
+        resource = getResource(fallback, QUrl());
     }
 
-    resource = createResource(
-        url,
-        fallback.isValid() ?  getResource(fallback, QUrl()) : QSharedPointer<Resource>(),
-        extra);
-    resource->setSelf(resource);
-    resource->setCache(this);
-    resource->moveToThread(qApp->thread());
-    connect(resource.data(), &Resource::updateSize, this, &ResourceCache::updateTotalSize);
-    {
-        QWriteLocker locker(&_resourcesLock);
-        _resources.insert(url, resource);
+    if (!resource) {
+        resource = createResource(
+            url,
+            fallback.isValid() ?  getResource(fallback, QUrl()) : QSharedPointer<Resource>(),
+            extra);        resource->setSelf(resource);
+        resource->setCache(this);
+        resource->moveToThread(qApp->thread());
+        connect(resource.data(), &Resource::updateSize, this, &ResourceCache::updateTotalSize);
+        {
+            QWriteLocker locker(&_resourcesLock);
+            _resources.insert(url, resource);
+        }
+        removeUnusedResource(resource);
+        resource->ensureLoading();
     }
-    removeUnusedResource(resource);
-    resource->ensureLoading();
 
+    DependencyManager::get<ResourceRequestObserver>()->update(resource->getURL());
     return resource;
 }
 
@@ -395,7 +398,7 @@ void ResourceCache::addUnusedResource(const QSharedPointer<Resource>& resource) 
         return;
     }
     reserveUnusedResource(resource->getBytes());
-    
+
     resource->setLRUKey(++_lastLRUKey);
     _unusedResourcesSize += resource->getBytes();
 
@@ -422,7 +425,7 @@ void ResourceCache::reserveUnusedResource(qint64 resourceSize) {
            _unusedResourcesSize + resourceSize > _unusedResourcesMaxSize) {
         // unload the oldest resource
         QMap<int, QSharedPointer<Resource> >::iterator it = _unusedResources.begin();
-        
+
         it.value()->setCache(nullptr);
         auto size = it.value()->getBytes();
 
@@ -476,7 +479,7 @@ void ResourceCache::updateTotalSize(const qint64& deltaSize) {
 
     emit dirty();
 }
- 
+
 QList<QSharedPointer<Resource>> ResourceCache::getLoadingRequests() {
     return DependencyManager::get<ResourceCacheSharedItems>()->getLoadingRequests();
 }
@@ -499,7 +502,7 @@ bool ResourceCache::attemptRequest(QSharedPointer<Resource> resource) {
         sharedItems->appendPendingRequest(resource);
         return false;
     }
-    
+
     ++_requestsActive;
     sharedItems->appendActiveRequest(resource);
     resource->makeRequest();
@@ -598,7 +601,7 @@ void Resource::refresh() {
         _request = nullptr;
         ResourceCache::requestCompleted(_self);
     }
-    
+
     _activeUrl = _url;
     init();
     ensureLoading();
@@ -612,7 +615,7 @@ void Resource::allReferencesCleared() {
     }
 
     if (_cache && isCacheable()) {
-        // create and reinsert new shared pointer 
+        // create and reinsert new shared pointer
         QSharedPointer<Resource> self(this, &Resource::allReferencesCleared);
         setSelf(self);
         reinsert();
@@ -637,10 +640,10 @@ void Resource::init(bool resetLoaded) {
         _loaded = false;
     }
     _attempts = 0;
-    
+
     if (_url.isEmpty()) {
         _startedLoading = _loaded = true;
-        
+
     } else if (!(_url.isValid())) {
         _startedLoading = _failedToLoad = true;
     }
@@ -760,7 +763,7 @@ void Resource::handleReplyFinished() {
     } else {
         handleFailedRequest(result);
     }
-    
+
     _request->disconnect(this);
     _request->deleteLater();
     _request = nullptr;

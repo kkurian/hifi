@@ -26,6 +26,7 @@
 #include "NetworkAccessManager.h"
 #include "NetworkLogging.h"
 
+
 ResourceManager::ResourceManager(bool atpSupportEnabled) : _atpSupportEnabled(atpSupportEnabled) {
     _thread.setObjectName("Resource Manager Thread");
 
@@ -138,6 +139,7 @@ ResourceRequest* ResourceManager::createResourceRequest(QObject* parent, const Q
         QObject::connect(parent, &QObject::destroyed, request, &QObject::deleteLater);
     }
     request->moveToThread(&_thread);
+
     return request;
 }
 
@@ -163,7 +165,7 @@ bool ResourceManager::resourceExists(const QUrl& url) {
 
         return reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200;
     } else if (scheme == URL_SCHEME_ATP && _atpSupportEnabled) {
-        auto request = new AssetResourceRequest(url);
+        auto request = new AssetResourceRequest(url, ResourceRequest::IS_NOT_OBSERVABLE);
         ByteRange range;
         range.fromInclusive = 1;
         range.toExclusive = 1;

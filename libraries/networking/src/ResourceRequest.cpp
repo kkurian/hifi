@@ -10,6 +10,7 @@
 //
 
 #include "ResourceRequest.h"
+#include "ResourceRequestObserver.h"
 
 #include <DependencyManager.h>
 #include <StatTracker.h>
@@ -18,7 +19,15 @@
 
 ResourceRequest::ResourceRequest(const QUrl& url) : _url(url) { }
 
+ResourceRequest::ResourceRequest(const QUrl& url, const bool isObservable) :
+    _url(url), _isObservable(isObservable)
+    { }
+
 void ResourceRequest::send() {
+    if (_isObservable) {
+        DependencyManager::get<ResourceRequestObserver>()->update(_url);
+    }
+
     if (QThread::currentThread() != thread()) {
         QMetaObject::invokeMethod(this, "send", Qt::QueuedConnection);
         return;

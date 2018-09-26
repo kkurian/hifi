@@ -49,6 +49,31 @@ var NO_BUTTON = 0; // QMessageBox::NoButton
 
 var NO_PERMISSIONS_ERROR_MESSAGE = "Cannot download model because you can't write to \nthe domain's Asset Server.";
 
+
+var resourceRequestEvents = []
+function signalResourceRequestEvent(data) {
+    print("!!!!!! sending resourceRequestEvent");
+    ui.tablet.sendToQml({
+        method: "resourceRequestEvent",
+        data: data });
+}
+
+function onResourceRequestEvent(data) {
+    var resourceRequestEvent = {
+        "date": JSON.stringify(new Date()),
+        "url": data.url,
+        "verb": data.verb,
+        "referrer": null };  // XXX referrer is TBD
+    resourceRequestEvents.push(resourceRequestEvent);
+    signalResourceRequestEvent(resourceRequestEvent);
+}
+
+function pushResourceRequestEvents() {
+    for (var urlString in resourceRequestEvents) {
+        signalResourceRequestEvent(urlString);
+    }
+}
+
 function onMessageBoxClosed(id, button) {
     if (id === messageBox && button === CANCEL_BUTTON) {
         isDownloadBeingCancelled = true;
@@ -1127,6 +1152,7 @@ var onTabletScreenChanged = function onTabletScreenChanged(type, url) {
         // variable amount of time to come up, in practice less than
         // 750ms.
         Script.setTimeout(pushResourceObjectsInTest, 750);
+        Script.setTimeout(pushResourceRequestEvents, 750);
     }
 
     console.debug(ui.buttonName + " app reports: Tablet screen changed.\nNew screen type: " + type +
@@ -1193,6 +1219,7 @@ function startup() {
     ui.tablet.webEventReceived.connect(onWebEventReceived);
     Wallet.walletStatusChanged.connect(sendCommerceSettings);
     Window.messageBoxClosed.connect(onMessageBoxClosed);
+    ResourceRequestObserver.resourceRequestEvent.connect(onResourceRequestEvent);
 
     Wallet.refreshWalletStatus();
 }
@@ -1226,6 +1253,7 @@ function shutdown() {
     GlobalServices.myUsernameChanged.disconnect(onUsernameChanged);
     Entities.canWriteAssetsChanged.disconnect(onCanWriteAssetsChanged);
     ContextOverlay.contextOverlayClicked.disconnect(openInspectionCertificateQML);
+    ResourceRequestObserver.resourceRequestEvent.disconnect(onResourceRequestEvent);
 
     off();
 }
