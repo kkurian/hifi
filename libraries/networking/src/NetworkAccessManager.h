@@ -12,17 +12,18 @@
 #ifndef hifi_NetworkAccessManager_h
 #define hifi_NetworkAccessManager_h
 
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkRequest>
 #include <QtQml/QQmlNetworkAccessManagerFactory>
 
+#include "WrappedNetworkAccessManager.h"
+
+
 /// Wrapper around QNetworkAccessManager to restrict at one instance by thread
-class NetworkAccessManager : public QNetworkAccessManager {
+class NetworkAccessManager : public WrappedNetworkAccessManager {
     Q_OBJECT
 public:
-    static QNetworkAccessManager& getInstance();
+    static WrappedNetworkAccessManager& getInstance();
 protected:
-    NetworkAccessManager(QObject* parent = Q_NULLPTR) : QNetworkAccessManager(parent) {}
+    NetworkAccessManager(QObject* parent = Q_NULLPTR) : WrappedNetworkAccessManager(parent) {}
     virtual QNetworkReply* createRequest(Operation op, const QNetworkRequest& request, QIODevice* device = Q_NULLPTR) override;
 };
 

@@ -49,6 +49,26 @@ var NO_BUTTON = 0; // QMessageBox::NoButton
 
 var NO_PERMISSIONS_ERROR_MESSAGE = "Cannot download model because you can't write to \nthe domain's Asset Server.";
 
+
+var resourceAccessEvents = []
+function signalResourceAccessEvent(data) {
+    ui.tablet.sendToQml({
+        method: "resourceAccessEvent",
+        data: data });
+}
+
+function onResourceAccessEvent(urlString) {
+    var resourceAccessEvent = {"date": JSON.stringify(new Date()), "url": urlString }
+    resourceAccessEvents.push(resourceAccessEvent);
+    signalResourceAccessEvent(resourceAccessEvent);
+}
+
+function pushResourceAccessEvents() {
+    for (var urlString in resourceAccessEvents) {
+        signalResourceAccessEvent(urlString);
+    }
+}
+
 function onMessageBoxClosed(id, button) {
     if (id === messageBox && button === CANCEL_BUTTON) {
         isDownloadBeingCancelled = true;
@@ -1127,6 +1147,7 @@ var onTabletScreenChanged = function onTabletScreenChanged(type, url) {
         // variable amount of time to come up, in practice less than
         // 750ms.
         Script.setTimeout(pushResourceObjectsInTest, 750);
+        Script.setTimeout(pushResourceAccessEvents, 750);
     }
 
     console.debug(ui.buttonName + " app reports: Tablet screen changed.\nNew screen type: " + type +
@@ -1193,6 +1214,7 @@ function startup() {
     ui.tablet.webEventReceived.connect(onWebEventReceived);
     Wallet.walletStatusChanged.connect(sendCommerceSettings);
     Window.messageBoxClosed.connect(onMessageBoxClosed);
+    ResourceAccessMonitor.resourceAccessEvent.connect(onResourceAccessEvent);
 
     Wallet.refreshWalletStatus();
 }
@@ -1226,6 +1248,7 @@ function shutdown() {
     GlobalServices.myUsernameChanged.disconnect(onUsernameChanged);
     Entities.canWriteAssetsChanged.disconnect(onCanWriteAssetsChanged);
     ContextOverlay.contextOverlayClicked.disconnect(openInspectionCertificateQML);
+    ResourceAccessMonitor.resourceAccessEvent.disconnect(onResourceAccessEvent);
 
     off();
 }
