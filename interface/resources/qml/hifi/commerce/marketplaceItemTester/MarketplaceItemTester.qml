@@ -135,7 +135,7 @@ Rectangle {
                 id: scrollView
                 anchors.fill: parent
                 anchors.rightMargin: 12
-                anchors.bottom: rootActions.top
+                anchors.bottom: parent.top
                 anchors.bottomMargin: 20
                 anchors.leftMargin: 12
                 verticalScrollBarPolicy: Qt.ScrollBarAlwaysOn
