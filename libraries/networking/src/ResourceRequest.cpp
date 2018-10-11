@@ -17,15 +17,11 @@
 
 #include <QtCore/QThread>
 
-ResourceRequest::ResourceRequest(const QUrl& url) : _url(url) { }
-
-ResourceRequest::ResourceRequest(const QUrl& url, const bool isObservable) :
-    _url(url), _isObservable(isObservable)
-    { }
 
 void ResourceRequest::send() {
+    qDebug() << "!!!!! send() " + _callerId;
     if (_isObservable) {
-        DependencyManager::get<ResourceRequestObserver>()->update(_url);
+        DependencyManager::get<ResourceRequestObserver>()->update(_url, _callerId);
     }
 
     if (QThread::currentThread() != thread()) {

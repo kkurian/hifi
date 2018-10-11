@@ -22,7 +22,10 @@
 class AssetResourceRequest : public ResourceRequest {
     Q_OBJECT
 public:
-    AssetResourceRequest(const QUrl& url, const bool isObservable = true);
+    AssetResourceRequest(
+        const QUrl& url,
+        const bool isObservable = true,
+        const qint64 callerId = -1);
     virtual ~AssetResourceRequest() override;
 
 protected:

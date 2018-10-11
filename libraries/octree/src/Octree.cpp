@@ -734,11 +734,13 @@ QString getMarketplaceID(const QString& urlString) {
     return QString();
 }
 
-bool Octree::readFromURL(const QString& urlString) {
+bool Octree::readFromURL(const QString& urlString, const bool isObservable, const qint64 callerId) {
     QString trimmedUrl = urlString.trimmed();
     QString marketplaceID = getMarketplaceID(trimmedUrl);
-    auto request =
-        std::unique_ptr<ResourceRequest>(DependencyManager::get<ResourceManager>()->createResourceRequest(this, trimmedUrl));
+    qDebug() << "!!!!! going to createResourceRequest " << callerId;
+    auto request = std::unique_ptr<ResourceRequest>(
+        DependencyManager::get<ResourceManager>()->createResourceRequest(
+            this, trimmedUrl, isObservable, callerId));
 
     if (!request) {
         return false;

@@ -4,7 +4,7 @@
 //
 //  Load items not in the marketplace for testing purposes
 //
-//  Created by Zach Fox on 2018-09-05
+//  Created by Kerry Ivan Kurian on 2018-09-05
 //  Copyright 2018 High Fidelity, Inc.
 //
 //  Distributed under the Apache License, Version 2.0.
@@ -53,15 +53,20 @@ Rectangle {
                 spinner.visible = false;
                 break;
             case "nextObjectIdInTest":
+                print("!!!! message from script! " + JSON.stringify(message));
                 nextResourceObjectId = message.id;
                 spinner.visible = false;
                 break;
             case "resourceRequestEvent":
-                print("!!!!! got resource request event");
-                var date = new Date(JSON.parse(message.data.date));
+                try {
+                    var date = new Date(JSON.parse(message.data.date));
+                } catch(err) {
+                    print("!!!!! Date conversion failed: " + JSON.stringify(message.data));
+                }
                 if (date >= startDate) {
                     resourceAccessEventText += (
-                        "[" + date.toISOString() + "] " + message.data.url + "\n"
+                        message.data.callerId + " " + message.data.url +
+                        " [" + date.toISOString() + "]\n"
                     );
                 }
                 break;
@@ -75,7 +80,7 @@ Rectangle {
                          resource.match(/\.json\.gz$/) ? "content set" :
                          resource.match(/\.json$/) ? "entity or wearable" :
                          "unknown");
-        return { "id": nextResourceObjectId++,
+        return { "resourceObjectId": nextResourceObjectId++,
                  "resource": resource,
                  "assetType": assetType };
     }
@@ -100,11 +105,13 @@ Rectangle {
         return httpPattern.test(resource) ? resource : "file:///" + resource;
     }
 
-    function rezEntity(resource, entityType) {
+    function rezEntity(resource, entityType, resourceObjectId) {
+        print("!!!! tester_rezClicked");
         sendToScript({
             method: 'tester_rezClicked',
             itemHref: toUrl(resource),
-            itemType: entityType});
+            itemType: entityType,
+            itemId:   resourceObjectId });
     }
 
     Component.onCompleted: startDate = new Date()
@@ -158,7 +165,7 @@ Rectangle {
                             spacing: 5
 
                             property var actions: {
-                                "forward": function(resource, assetType){
+                                "forward": function(resource, assetType, resourceObjectId){
                                     switch(assetType) {
                                         case "application":
                                             Commerce.openApp(resource);
@@ -172,7 +179,7 @@ Rectangle {
                                             break;
                                         case "entity":
                                         case "wearable":
-                                            rezEntity(resource, assetType);
+                                            rezEntity(resource, assetType, resourceObjectId);
                                             break;
                                         default:
                                             print("Marketplace item tester unsupported assetType " + assetType);
@@ -233,7 +240,7 @@ Rectangle {
                                         assetType = model[currentIndex];
                                         sendToScript({
                                             method: "tester_updateResourceObjectAssetType",
-                                            objectId: resourceListModel.get(index)["id"],
+                                            objectId: resourceListModel.get(index)["resourceObjectId"],
                                             assetType: assetType });
                                     });
                                 }
@@ -261,7 +268,7 @@ Rectangle {
                                     MouseArea {
                                         anchors.fill: parent
                                         onClicked: {
-                                            listRow.actions[modelData](resource, comboBox.currentText);
+                                            listRow.actions[modelData](resource, comboBox.currentText, resourceObjectId);
                                         }
                                     }
                                 }
@@ -353,6 +360,7 @@ Rectangle {
                 // Alas, there is nothing we can do about that so charge
                 // ahead as though we are sure the present signal is one
                 // we expect.
+                print("!!!! resource selected");
                 switch(currentAction) {
                     case "load file":
                         Window.browseChanged.disconnect(onResourceSelected);
@@ -362,8 +370,11 @@ Rectangle {
                         break;
                 }
                 if (resource) {
+                    print("!!!! building resource object");
                     var resourceObj = buildResourceObj(resource);
+                    print("!!!! installing resource object");
                     installResourceObj(resourceObj);
+                    print("!!!! notifying script of resource object");
                     sendToScript({
                         method: 'tester_newResourceObject',
                         resourceObject: resourceObj });

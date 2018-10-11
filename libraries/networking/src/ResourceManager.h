@@ -34,7 +34,11 @@ public:
     QString normalizeURL(const QString& urlString);
     QUrl normalizeURL(const QUrl& url);
 
-    ResourceRequest* createResourceRequest(QObject* parent, const QUrl& url);
+    ResourceRequest* createResourceRequest(
+        QObject* parent,
+        const QUrl& url,
+        const bool isObservable = true,
+        const qint64 callerId = -1);
 
     void init();
     void cleanup();

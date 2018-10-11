@@ -50,9 +50,8 @@ var NO_BUTTON = 0; // QMessageBox::NoButton
 var NO_PERMISSIONS_ERROR_MESSAGE = "Cannot download model because you can't write to \nthe domain's Asset Server.";
 
 
-var resourceRequestEvents = []
+var resourceRequestEvents = [];
 function signalResourceRequestEvent(data) {
-    print("!!!!!! sending resourceRequestEvent");
     ui.tablet.sendToQml({
         method: "resourceRequestEvent",
         data: data });
@@ -62,15 +61,17 @@ function onResourceRequestEvent(data) {
     var resourceRequestEvent = {
         "date": JSON.stringify(new Date()),
         "url": data.url,
-        "verb": data.verb,
-        "referrer": null };  // XXX referrer is TBD
+        "callerId": data.callerId };
     resourceRequestEvents.push(resourceRequestEvent);
     signalResourceRequestEvent(resourceRequestEvent);
 }
 
 function pushResourceRequestEvents() {
-    for (var urlString in resourceRequestEvents) {
-        signalResourceRequestEvent(urlString);
+    var length = resourceRequestEvents.length
+    for (var i = 0; i < length; i++) {
+        if (i in resourceRequestEvents) {
+            signalResourceRequestEvent(resourceRequestEvents[i]);
+        }
     }
 }
 
@@ -547,13 +548,19 @@ function getPositionToCreateEntity(extra) {
     return position;
 }
 
-function rezEntity(itemHref, itemType) {
+function defaultFor(arg, val) {
+    return typeof arg !== 'undefined' ? arg : val;
+}
+
+function rezEntity(itemHref, itemType, marketplaceItemTesterId) {
     var isWearable = itemType === "wearable";
-    var success = Clipboard.importEntities(itemHref);
+    print("!!!!! Clipboard.importEntities " + marketplaceItemTesterId);
+    var success = Clipboard.importEntities(itemHref, true, marketplaceItemTesterId);
     var wearableLocalPosition = null;
     var wearableLocalRotation = null;
     var wearableLocalDimensions = null;
     var wearableDimensions = null;
+    marketplaceItemTesterId = defaultFor(marketplaceItemTesterId, -1);
 
     if (itemType === "contentSet") {
         console.log("Item is a content set; codepath shouldn't go here.");
@@ -902,11 +909,12 @@ var onQmlMessageReceived = function onQmlMessageReceived(message) {
     case 'checkout_rezClicked':
     case 'purchases_rezClicked':
     case 'tester_rezClicked':
-        rezEntity(message.itemHref, message.itemType);
+        print("!!!!! marketplaces tester_rezClicked");
+        rezEntity(message.itemHref, message.itemType, message.itemId);
         break;
     case 'tester_newResourceObject':
         var resourceObject = message.resourceObject;
-        resourceObjectsInTest[resourceObject.id] = resourceObject;
+        resourceObjectsInTest[resourceObject.resourceObjectId] = resourceObject;
         signalNewResourceObjectInTest(resourceObject);
         break;
     case 'tester_updateResourceObjectAssetType':
@@ -1054,16 +1062,20 @@ var onQmlMessageReceived = function onQmlMessageReceived(message) {
 };
 
 function pushResourceObjectsInTest() {
-    var maxObjectId = -1;
-    for (var objectId in resourceObjectsInTest) {
-        signalNewResourceObjectInTest(resourceObjectsInTest[objectId]);
-        maxObjectId = (maxObjectId < objectId) ? parseInt(objectId) : maxObjectId;
+    var maxResourceObjectId = -1;
+    var length = resourceObjectsInTest.length;
+    for (var i = 0; i < length; i++) {
+        if (i in resourceObjectsInTest) {
+            signalNewResourceObjectInTest(resourceObjectsInTest[i]);
+            var resourceObjectId = resourceObjectsInTest[i].resourceObjectId;
+            maxResourceObjectId = (maxResourceObjectId < resourceObjectId) ? parseInt(resourceObjectId) : maxResourceObjectId;
+        }
     }
     // N.B. Thinking about removing the following sendToQml? Be sure
     // that the marketplace item tester QML has heard from us, at least
     // so that it can indicate to the user that all of the resoruce
     // objects in test have been transmitted to it.
-    ui.tablet.sendToQml({ method: "nextObjectIdInTest", id: maxObjectId + 1 });
+    ui.tablet.sendToQml({ method: "nextObjectIdInTest", id: maxResourceObjectId + 1 });
 }
 
 // Function Name: onTabletScreenChanged()

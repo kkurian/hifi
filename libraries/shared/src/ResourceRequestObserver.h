@@ -21,8 +21,8 @@ class ResourceRequestObserver : public QObject, public Dependency {
     SINGLETON_DEPENDENCY
 
 public:
-    void update(const QNetworkRequest& request);
-    void update(const QUrl& url);
+    void update(const QNetworkRequest& request, const qint64 callerId = -1);
+    void update(const QUrl& url, const qint64 callerId = -1);
 
 signals:
     void resourceRequestEvent(QVariantMap result);

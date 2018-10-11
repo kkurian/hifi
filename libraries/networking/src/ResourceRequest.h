@@ -43,8 +43,12 @@ public:
     static const bool IS_OBSERVABLE = true;
     static const bool IS_NOT_OBSERVABLE = false;
 
-    ResourceRequest(const QUrl& url);
-    ResourceRequest(const QUrl& url, const bool isObservable);
+    ResourceRequest(
+        const QUrl& url,
+        const bool isObservable = IS_OBSERVABLE,
+        const qint64 callerId = -1
+    ) : _url(url), _isObservable(isObservable), _callerId(callerId) { }
+
     virtual ~ResourceRequest() = default;
 
     enum State {
@@ -103,7 +107,8 @@ protected:
     bool _rangeRequestSuccessful { false };
     uint64_t _totalSizeOfResource { 0 };
     int64_t _lastRecordedBytesDownloaded { 0 };
-    bool _isObservable { true };
+    bool _isObservable;
+    qint64 _callerId;
 };
 
 #endif

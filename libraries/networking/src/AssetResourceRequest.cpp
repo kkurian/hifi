@@ -24,8 +24,8 @@
 
 static const int DOWNLOAD_PROGRESS_LOG_INTERVAL_SECONDS = 5;
 
-AssetResourceRequest::AssetResourceRequest(const QUrl& url, const bool isObservable) :
-    ResourceRequest(url, isObservable)
+AssetResourceRequest::AssetResourceRequest(const QUrl& url, const bool isObservable, const qint64 callerId) :
+    ResourceRequest(url, isObservable, callerId)
 {
     _lastProgressDebug = p_high_resolution_clock::now() - std::chrono::seconds(DOWNLOAD_PROGRESS_LOG_INTERVAL_SECONDS);
 }
