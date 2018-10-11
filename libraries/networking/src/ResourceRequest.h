@@ -46,8 +46,9 @@ public:
     ResourceRequest(
         const QUrl& url,
         const bool isObservable = IS_OBSERVABLE,
-        const qint64 callerId = -1
-    ) : _url(url), _isObservable(isObservable), _callerId(callerId) { }
+        const qint64 callerId = -1,
+        const QString& extra = ""
+    ) : _url(url), _isObservable(isObservable), _callerId(callerId), _extra(extra) { }
 
     virtual ~ResourceRequest() = default;
 
@@ -109,6 +110,7 @@ protected:
     int64_t _lastRecordedBytesDownloaded { 0 };
     bool _isObservable;
     qint64 _callerId;
+    QString _extra;
 };
 
 #endif

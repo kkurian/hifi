@@ -16,14 +16,15 @@
 #include "ResourceRequestObserver.h"
 
 
-void ResourceRequestObserver::update(const QNetworkRequest& request, const qint64 callerId) {
-    update(request.url(), callerId);
+void ResourceRequestObserver::update(const QNetworkRequest& request, const qint64 callerId, const QString& extra) {
+    update(request.url(), callerId, extra);
 }
 
-void ResourceRequestObserver::update(const QUrl& url, const qint64 callerId) {
+void ResourceRequestObserver::update(const QUrl& url, const qint64 callerId, const QString& extra) {
     QJsonObject data {
         { "url", url.toDisplayString() },
-        { "callerId", callerId }
+        { "callerId", callerId },
+        { "extra", extra }
     };
     emit resourceRequestEvent(data.toVariantMap());
 }

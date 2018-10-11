@@ -2168,7 +2168,8 @@ void AvatarData::updateJointMappings() {
         QNetworkRequest networkRequest = QNetworkRequest(_skeletonModelURL);
         networkRequest.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
         networkRequest.setHeader(QNetworkRequest::UserAgentHeader, HIGH_FIDELITY_USER_AGENT);
-        DependencyManager::get<ResourceRequestObserver>()->update(_skeletonModelURL);
+        DependencyManager::get<ResourceRequestObserver>()->update(
+            _skeletonModelURL, -1, "AvatarData::updateJointMappings");
         QNetworkReply* networkReply = networkAccessManager.get(networkRequest);
         //
         ////

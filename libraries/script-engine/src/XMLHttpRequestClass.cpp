@@ -190,7 +190,7 @@ void XMLHttpRequestClass::send(const QScriptValue& data) {
 }
 
 void XMLHttpRequestClass::doSend() {
-    DependencyManager::get<ResourceRequestObserver>()->update(_url);
+    DependencyManager::get<ResourceRequestObserver>()->update(_url, -1, "XMLHttpRequestClass::doSend");
     _reply = NetworkAccessManager::getInstance().sendCustomRequest(_request, _method.toLatin1(), _sendData);
     connectToReply(_reply);
 

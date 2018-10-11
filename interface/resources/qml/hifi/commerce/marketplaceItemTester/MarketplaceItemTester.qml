@@ -63,9 +63,14 @@ Rectangle {
                 } catch(err) {
                     print("!!!!! Date conversion failed: " + JSON.stringify(message.data));
                 }
+                // XXX Eventually this date check goes away b/c we will
+                // be able to match up resouce access events to resource
+                // object ids, ignoring those that have -1 resource
+                // object ids.
                 if (date >= startDate) {
                     resourceAccessEventText += (
-                        message.data.callerId + " " + message.data.url +
+                        message.data.callerId + " " + message.data.extra +
+                        " " + message.data.url +
                         " [" + date.toISOString() + "]\n"
                     );
                 }

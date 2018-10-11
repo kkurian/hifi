@@ -61,7 +61,8 @@ function onResourceRequestEvent(data) {
     var resourceRequestEvent = {
         "date": JSON.stringify(new Date()),
         "url": data.url,
-        "callerId": data.callerId };
+        "callerId": data.callerId,
+        "extra": data.extra };
     resourceRequestEvents.push(resourceRequestEvent);
     signalResourceRequestEvent(resourceRequestEvent);
 }

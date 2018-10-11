@@ -19,9 +19,10 @@
 
 
 void ResourceRequest::send() {
-    qDebug() << "!!!!! send() " + _callerId;
+    qDebug() << "!!!!! ResourceRequest::send() " + _callerId;
     if (_isObservable) {
-        DependencyManager::get<ResourceRequestObserver>()->update(_url, _callerId);
+        DependencyManager::get<ResourceRequestObserver>()->update(
+            _url, _callerId, _extra + " => ResourceRequest::send" );
     }
 
     if (QThread::currentThread() != thread()) {

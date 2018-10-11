@@ -25,7 +25,8 @@ public:
     AssetResourceRequest(
         const QUrl& url,
         const bool isObservable = true,
-        const qint64 callerId = -1);
+        const qint64 callerId = -1,
+        const QString& extra = "");
     virtual ~AssetResourceRequest() override;
 
 protected:

@@ -740,7 +740,7 @@ bool Octree::readFromURL(const QString& urlString, const bool isObservable, cons
     qDebug() << "!!!!! going to createResourceRequest " << callerId;
     auto request = std::unique_ptr<ResourceRequest>(
         DependencyManager::get<ResourceManager>()->createResourceRequest(
-            this, trimmedUrl, isObservable, callerId));
+            this, trimmedUrl, isObservable, callerId, "Octree::readFromURL"));
 
     if (!request) {
         return false;

@@ -379,7 +379,8 @@ QSharedPointer<Resource> ResourceCache::getResource(const QUrl& url, const QUrl&
         resource->ensureLoading();
     }
 
-    DependencyManager::get<ResourceRequestObserver>()->update(resource->getURL());
+    DependencyManager::get<ResourceRequestObserver>()->update(
+        resource->getURL(), -1, "ResourceCache::getResource");
     return resource;
 }
 
@@ -695,7 +696,8 @@ void Resource::makeRequest() {
 
     PROFILE_ASYNC_BEGIN(resource, "Resource:" + getType(), QString::number(_requestID), { { "url", _url.toString() }, { "activeURL", _activeUrl.toString() } });
 
-    _request = DependencyManager::get<ResourceManager>()->createResourceRequest(this, _activeUrl);
+    _request = DependencyManager::get<ResourceManager>()->createResourceRequest(
+        this, _activeUrl, true, -1, "Resource::makeRequest");
 
     if (!_request) {
         qCDebug(networking).noquote() << "Failed to get request for" << _url.toDisplayString();
