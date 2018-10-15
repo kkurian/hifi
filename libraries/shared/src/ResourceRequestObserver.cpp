@@ -15,15 +15,15 @@
 #include <QString>
 #include <QUrl>
 #include "ResourceRequestObserver.h"
-#include "QUrlVector.h"
+#include "QUrlAncestry.h"
 
 
 // void ResourceRequestObserver::update(const QNetworkRequest& request, const qint64 callerId, const QString& extra) {
-//     update(QUrlVector(request.url()), callerId, extra);
+//     update(QUrlAncestry(request.url()), callerId, extra);
 // }
 
 void ResourceRequestObserver::update(
-    const QUrlVector& urlAncestry,
+    const QUrlAncestry& urlAncestry,
     const qint64 callerId,
     const QString& extra
 ) {

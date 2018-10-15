@@ -1,5 +1,5 @@
 //
-//  QUrlVector.h
+//  QUrlAncestry.h
 //  libraries/shared/src/
 //
 //  Created by Kerry Ivan Kurian on 10/12/18.
@@ -10,18 +10,19 @@
 //
 
 
-#ifndef hifi_QUrlVector_H
-#define hifi_QUrlVector_H
+#ifndef hifi_QUrlAncestry_H
+#define hifi_QUrlAncestry_H
 
 #include <QJsonArray>
 #include <QUrl>
 #include <QVector>
 
 
-class QUrlVector : public QVector<QUrl> {
+class QUrlAncestry : public QVector<QUrl> {
 public:
-    QUrlVector();
+    QUrlAncestry();
     void toJson(QJsonArray& array) const;
+    const QUrl url() const;
 };
 
 

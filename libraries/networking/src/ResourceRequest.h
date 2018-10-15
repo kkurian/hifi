@@ -18,7 +18,7 @@
 #include <cstdint>
 
 #include "ByteRange.h"
-#include "QUrlVector.h"
+#include "QUrlAncestry.h"
 
 
 const QString STAT_ATP_REQUEST_STARTED = "StartedATPRequest";
@@ -46,15 +46,15 @@ public:
     static const bool IS_NOT_OBSERVABLE = false;
 
     ResourceRequest(
-        const QUrlVector& ancestry,
+        const QUrlAncestry& urlAncestry,
         const bool isObservable = IS_OBSERVABLE,
         const qint64 callerId = -1,
         const QString& extra = ""
-    ) : _ancestry(ancestry),
+    ) : _urlAncestry(urlAncestry),
         _isObservable(isObservable),
         _callerId(callerId),
         _extra(extra),
-        _url(ancestry.last())
+        _url(urlAncestry.last())
     { }
 
     virtual ~ResourceRequest() = default;
@@ -119,7 +119,7 @@ protected:
     bool _isObservable;
     qint64 _callerId;
     QString _extra;
-    QUrlVector _ancestry;
+    QUrlAncestry _urlAncestry;
 };
 
 #endif

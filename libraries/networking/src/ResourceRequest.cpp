@@ -21,7 +21,7 @@
 void ResourceRequest::send() {
     if (_isObservable) {
         DependencyManager::get<ResourceRequestObserver>()->update(
-            _ancestry, _callerId, _extra + " => ResourceRequest::send" );
+            _urlAncestry, _callerId, _extra + " => ResourceRequest::send" );
     }
 
     if (QThread::currentThread() != thread()) {
