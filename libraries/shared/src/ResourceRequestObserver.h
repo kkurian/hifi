@@ -10,10 +10,12 @@
 //
 
 
-#include "DependencyManager.h"
 #include <QJsonObject>
 #include <QString>
 #include <QNetworkRequest>
+
+#include "DependencyManager.h"
+#include "QUrlVector.h"
 
 
 class ResourceRequestObserver : public QObject, public Dependency {
@@ -21,8 +23,8 @@ class ResourceRequestObserver : public QObject, public Dependency {
     SINGLETON_DEPENDENCY
 
 public:
-    void update(const QNetworkRequest& request, const qint64 callerId = -1, const QString& extra = "");
-    void update(const QUrl& url, const qint64 callerId = -1, const QString& extra = "");
+    // void update(const QNetworkRequest& request, const qint64 callerId = -1, const QString& extra = "");
+    void update(const QUrlVector& urlAncestry, const qint64 callerId = -1, const QString& extra = "");
 
 signals:
     void resourceRequestEvent(QVariantMap result);

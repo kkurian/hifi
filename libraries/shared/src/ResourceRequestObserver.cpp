@@ -10,19 +10,27 @@
 //
 
 
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QString>
 #include <QUrl>
 #include "ResourceRequestObserver.h"
+#include "QUrlVector.h"
 
 
-void ResourceRequestObserver::update(const QNetworkRequest& request, const qint64 callerId, const QString& extra) {
-    update(request.url(), callerId, extra);
-}
+// void ResourceRequestObserver::update(const QNetworkRequest& request, const qint64 callerId, const QString& extra) {
+//     update(QUrlVector(request.url()), callerId, extra);
+// }
 
-void ResourceRequestObserver::update(const QUrl& url, const qint64 callerId, const QString& extra) {
+void ResourceRequestObserver::update(
+    const QUrlVector& urlAncestry,
+    const qint64 callerId,
+    const QString& extra
+) {
+    QJsonArray array;
+    urlAncestry.toJson(array);
     QJsonObject data {
-        { "url", url.toDisplayString() },
+        { "url", array },
         { "callerId", callerId },
         { "extra", extra }
     };

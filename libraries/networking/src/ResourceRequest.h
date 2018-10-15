@@ -18,6 +18,8 @@
 #include <cstdint>
 
 #include "ByteRange.h"
+#include "QUrlVector.h"
+
 
 const QString STAT_ATP_REQUEST_STARTED = "StartedATPRequest";
 const QString STAT_HTTP_REQUEST_STARTED = "StartedHTTPRequest";
@@ -44,11 +46,16 @@ public:
     static const bool IS_NOT_OBSERVABLE = false;
 
     ResourceRequest(
-        const QUrl& url,
+        const QUrlVector& ancestry,
         const bool isObservable = IS_OBSERVABLE,
         const qint64 callerId = -1,
         const QString& extra = ""
-    ) : _url(url), _isObservable(isObservable), _callerId(callerId), _extra(extra) { }
+    ) : _ancestry(ancestry),
+        _isObservable(isObservable),
+        _callerId(callerId),
+        _extra(extra),
+        _url(ancestry.last())
+    { }
 
     virtual ~ResourceRequest() = default;
 
@@ -96,6 +103,7 @@ protected:
     virtual void doSend() = 0;
     void recordBytesDownloadedInStats(const QString& statName, int64_t bytesReceived);
 
+
     QUrl _url;
     QUrl _relativePathURL;
     State _state { NotStarted };
@@ -111,6 +119,7 @@ protected:
     bool _isObservable;
     qint64 _callerId;
     QString _extra;
+    QUrlVector _ancestry;
 };
 
 #endif
