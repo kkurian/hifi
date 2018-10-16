@@ -168,6 +168,7 @@
 #include "ModelPackager.h"
 #include "scripting/Audio.h"
 #include "networking/CloseEventSender.h"
+#include "QUrlAncestry.h"
 #include "scripting/TestScriptingInterface.h"
 #include "scripting/AssetMappingsScriptingInterface.h"
 #include "scripting/ClipboardScriptingInterface.h"
@@ -5025,8 +5026,7 @@ bool Application::importEntities(const QString& urlOrFilename, const bool isObse
     bool success = false;
     _entityClipboard->withWriteLock([&] {
         _entityClipboard->eraseAllOctreeElements();
-        qDebug() << "!!!!! going to readFromURL " << callerId;
-        success = _entityClipboard->readFromURL(urlOrFilename, isObservable, callerId);
+        success = _entityClipboard->readFromURL(urlOrFilename, isObservable, callerId, QUrlAncestry());
         if (success) {
             _entityClipboard->reaverageOctreeElements();
         }
