@@ -2159,10 +2159,10 @@ void AvatarData::updateJointMappings() {
 
     if (_skeletonModelURL.fileName().toLower().endsWith(".fst")) {
         ////
-        // Should we rely upon HTTPResourceRequest instead?
-        // HTTPResourceRequest::doSend() covers all of this and then
-        // some. (It doesn't cover the connect() call, so we may want to
-        // add a HTTPResourceRequest::doSend() method that does
+        // TODO: Should we rely upon HTTPResourceRequest instead?
+        // HTTPResourceRequest::doSend() covers all of the following and
+        // then some. It doesn't cover the connect() call, so we may
+        // want to add a HTTPResourceRequest::doSend() method that does
         // connects.
         QNetworkAccessManager& networkAccessManager = NetworkAccessManager::getInstance();
         QNetworkRequest networkRequest = QNetworkRequest(_skeletonModelURL);
