@@ -12,6 +12,18 @@
 #include "QUrlAncestry.h"
 
 
+QUrlAncestry::QUrlAncestry(const QUrl& resource, const QUrl& referrer) {
+    this->append(referrer);
+    this->append(resource);
+}
+
+QUrlAncestry::QUrlAncestry(
+    const QUrl& resource,
+    const QUrlAncestry& ancestors) : QVector<QUrl>(ancestors)
+{
+    this->append(resource);
+}
+
 void QUrlAncestry::toJson(QJsonArray& array) const {
     for (auto const& qurl : *this) {
         array.append(qurl.toDisplayString());

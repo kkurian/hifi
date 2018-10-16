@@ -20,7 +20,10 @@
 
 class QUrlAncestry : public QVector<QUrl> {
 public:
-    QUrlAncestry();
+    QUrlAncestry() {}
+    QUrlAncestry(const QUrl& resource, const QUrl& referrer = QUrl("__NONE__"));
+    QUrlAncestry(const QUrl& resource, const QUrlAncestry& ancestors);
+
     void toJson(QJsonArray& array) const;
     const QUrl url() const;
 };
