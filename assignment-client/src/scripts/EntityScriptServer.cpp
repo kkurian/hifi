@@ -36,6 +36,7 @@
 #include "../AssignmentDynamicFactory.h"
 #include "EntityScriptServerLogging.h"
 #include "../entities/AssignmentParentFinder.h"
+#include "QUrlAncestry.h"
 
 using Mutex = std::mutex;
 using Lock = std::lock_guard<Mutex>;
@@ -513,7 +514,7 @@ void EntityScriptServer::shutdownScriptEngine() {
     }
 }
 
-void EntityScriptServer::addingEntity(const EntityItemID& entityID) {
+void EntityScriptServer::addingEntity(const EntityItemID& entityID, const QUrlAncestry& ancestry) {
     checkAndCallPreload(entityID);
 }
 

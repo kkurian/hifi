@@ -26,6 +26,9 @@
 #include <render/Forward.h>
 #include <workload/Space.h>
 
+#include "EntityItemWeakPointerWithUrlAncestry.h"
+
+
 class AbstractScriptingServicesInterface;
 class AbstractViewStateInterface;
 class Model;
@@ -123,7 +126,7 @@ signals:
     void collisionWithEntity(const EntityItemID& idA, const EntityItemID& idB, const Collision& collision);
 
 public slots:
-    void addingEntity(const EntityItemID& entityID);
+    void addingEntity(const EntityItemID& entityID, const QUrlAncestry& urlAncestry);
     void deletingEntity(const EntityItemID& entityID);
     void entityScriptChanging(const EntityItemID& entityID, const bool reload);
     void entityCollisionWithEntity(const EntityItemID& idA, const EntityItemID& idB, const Collision& collision);
@@ -251,6 +254,7 @@ private:
 
     std::unordered_map<EntityItemID, EntityRendererPointer> _renderablesToUpdate;
     std::unordered_map<EntityItemID, EntityRendererPointer> _entitiesInScene;
+    // std::unordered_map<EntityItemID, EntityItemWeakPointerWithUrlAncestry> _entitiesToAdd;
     std::unordered_map<EntityItemID, EntityItemWeakPointer> _entitiesToAdd;
     // For Scene.shouldRenderEntities
     QList<EntityItemID> _entityIDsLastInScene;

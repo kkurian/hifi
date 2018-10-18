@@ -305,7 +305,7 @@ void EntityTree::postAddEntity(EntityItemPointer entity) {
     // find and hook up any entities with this entity as a (previously) missing parent
     fixupNeedsParentFixups();
 
-    emit addingEntity(entity->getEntityItemID());
+    emit addingEntity(entity->getEntityItemID(), QUrlAncestry());
 }
 
 bool EntityTree::updateEntity(const EntityItemID& entityID, const EntityItemProperties& properties, const SharedNodePointer& senderNode) {

@@ -277,6 +277,7 @@ void EntityTreeRenderer::addPendingEntities(const render::ScenePointer& scene, r
     // FIXME should be able to use std::remove_if, but it fails due to some
     // weird compilation error related to EntityItemID assignment operators
     for (auto itr = _entitiesToAdd.begin(); _entitiesToAdd.end() != itr; ) {
+        // if (itr->second.entityItemWeakPointer.expired()) {
         if (itr->second.expired()) {
             _entitiesToAdd.erase(itr++);
         } else {
@@ -287,6 +288,7 @@ void EntityTreeRenderer::addPendingEntities(const render::ScenePointer& scene, r
     if (!_entitiesToAdd.empty()) {
         std::unordered_set<EntityItemID> processedIds;
         for (const auto& entry : _entitiesToAdd) {
+            // auto entity = entry.second.entityItemWeakPointer.lock();
             auto entity = entry.second.lock();
             if (!entity) {
                 continue;
@@ -955,11 +957,12 @@ void EntityTreeRenderer::deletingEntity(const EntityItemID& entityID) {
     scene->enqueueTransaction(transaction);
 }
 
-void EntityTreeRenderer::addingEntity(const EntityItemID& entityID) {
+void EntityTreeRenderer::addingEntity(const EntityItemID& entityID, const QUrlAncestry& urlAncestry) {
     forceRecheckEntities(); // reset our state to force checking our inside/outsideness of entities
     checkAndCallPreload(entityID);
     auto entity = std::static_pointer_cast<EntityTree>(_tree)->findEntityByID(entityID);
     if (entity) {
+        // _entitiesToAdd.insert({ entity->getEntityItemID(), { entity, urlAncestry } });
         _entitiesToAdd.insert({ entity->getEntityItemID(),  entity });
     }
 }
@@ -1088,7 +1091,7 @@ void EntityTreeRenderer::entityCollisionWithEntity(const EntityItemID& idA, cons
 void EntityTreeRenderer::updateEntityRenderStatus(bool shouldRenderEntities) {
     if (DependencyManager::get<SceneScriptingInterface>()->shouldRenderEntities()) {
         for (auto entityID : _entityIDsLastInScene) {
-            addingEntity(entityID);
+            addingEntity(entityID, QUrlAncestry());
         }
         _entityIDsLastInScene.clear();
     } else {

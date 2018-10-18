@@ -35,6 +35,7 @@
 #include "EntityItemProperties.h"
 
 #include "BaseScriptEngine.h"
+#include "QUrlAncestry.h"
 
 class EntityTree;
 class MeshProxy;
@@ -1879,7 +1880,7 @@ signals:
      *     print("Added entity: " + entityID);
      * });
      */
-    void addingEntity(const EntityItemID& entityID);
+    void addingEntity(const EntityItemID& entityID, const QUrlAncestry& ancestry);
 
     /**jsdoc
      * Triggered when you disconnect from a domain, at which time Interface's local in-memory tree of entities it knows about

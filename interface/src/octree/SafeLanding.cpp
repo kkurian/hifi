@@ -17,6 +17,7 @@
 #include "RenderableModelEntityItem.h"
 #include "InterfaceLogging.h"
 #include "Application.h"
+#include "QUrlAncestry.h"
 
 const int SafeLanding::SEQUENCE_MODULO = std::numeric_limits<OCTREE_PACKET_SEQUENCE>::max() + 1;
 
@@ -193,7 +194,7 @@ bool SafeLanding::isEntityLoadingComplete() {
         if (enableInterstitial) {
             auto entityRenderable = entityTree->renderableForEntityId(entityMapIter->first);
             if (!entityRenderable) {
-                entityTree->addingEntity(entityMapIter->first);
+                entityTree->addingEntity(entityMapIter->first, QUrlAncestry());
             }
 
             isVisuallyReady = entity->isVisuallyReady() || (!entityRenderable && !entity->isParentPathComplete());

@@ -23,6 +23,8 @@
 #include <ScriptEngine.h>
 #include <ThreadedAssignment.h>
 #include "../entities/EntityTreeHeadlessViewer.h"
+#include "QUrlAncestry.h"
+
 
 class EntityScriptServer : public ThreadedAssignment {
     Q_OBJECT
@@ -64,7 +66,7 @@ private:
     void clear();
     void shutdownScriptEngine();
 
-    void addingEntity(const EntityItemID& entityID);
+    void addingEntity(const EntityItemID& entityID, const QUrlAncestry& ancestry);
     void deletingEntity(const EntityItemID& entityID);
     void entityServerScriptChanging(const EntityItemID& entityID, bool reload);
     void checkAndCallPreload(const EntityItemID& entityID, bool reload = false);
